@@ -34,7 +34,7 @@ if (!isset($_REQUEST["user"])) {
 
 try {
     // get streak stats for user given in query string
-    $contributionGraphs = getContributionGraphs('dushyantDevTips');
+    $contributionGraphs = getContributionGraphs($_REQUEST["user"]);
     $contributions = getContributionDates($contributionGraphs);
     $stats = getContributionStats($contributions);
     renderOutput($stats);
