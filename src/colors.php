@@ -1,7 +1,7 @@
 <?php
 
 // return a list of valid CSS colors
-return array(
+return [
     "aliceblue",
     "antiquewhite",
     "aqua",
@@ -27,8 +27,8 @@ return array(
     "darkcyan",
     "darkgoldenrod",
     "darkgray",
-    "darkgrey",
     "darkgreen",
+    "darkgrey",
     "darkkhaki",
     "darkmagenta",
     "darkolivegreen",
@@ -56,9 +56,9 @@ return array(
     "gold",
     "goldenrod",
     "gray",
-    "grey",
     "green",
     "greenyellow",
+    "grey",
     "honeydew",
     "hotpink",
     "indianred",
@@ -74,8 +74,8 @@ return array(
     "lightcyan",
     "lightgoldenrodyellow",
     "lightgray",
-    "lightgrey",
     "lightgreen",
+    "lightgrey",
     "lightpink",
     "lightsalmon",
     "lightseagreen",
@@ -143,6 +143,7 @@ return array(
     "teal",
     "thistle",
     "tomato",
+    "transparent",
     "turquoise",
     "violet",
     "wheat",
@@ -150,4 +151,4 @@ return array(
     "whitesmoke",
     "yellow",
     "yellowgreen",
-);
+];
