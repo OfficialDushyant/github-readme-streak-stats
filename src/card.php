@@ -336,6 +336,29 @@ function getCardHeight(array $params): int
 }
 
 /**
+ * Format number using locale and short number if requested
+ *
+ * @param float $num The number to format
+ * @param string $localeCode Locale code
+ * @param bool $useShortNumbers Whether to use short numbers
+ * @return string The formatted number
+ */
+function formatNumber(float $num, string $localeCode, bool $useShortNumbers): string
+{
+    $numFormatter = new NumberFormatter($localeCode, NumberFormatter::DECIMAL);
+    $suffix = "";
+    if ($useShortNumbers) {
+        $units = ["", "K", "M", "B", "T"];
+        for ($i = 0; $num >= 1000; $i++) {
+            $num /= 1000;
+        }
+        $suffix = $units[$i];
+        $num = round($num, 1);
+    }
+    return $numFormatter->format($num) . $suffix;
+}
+
+/**
  * Generate SVG output for a stats array
  *
  * @param array<string,mixed> $stats Streak stats
@@ -361,9 +384,6 @@ function generateCard(array $stats, array $params = null): string
     // get date format
     // locale date formatter (used only if date_format is not specified)
     $dateFormat = $params["date_format"] ?? ($localeTranslations["date_format"] ?? null);
-
-    // number formatter
-    $numFormatter = new NumberFormatter($localeCode, NumberFormatter::DECIMAL);
 
     // read border_radius parameter, default to 4.5 if not set
     $borderRadius = $params["border_radius"] ?? 4.5;
@@ -417,13 +437,15 @@ function generateCard(array $stats, array $params = null): string
         19.5 + $heightOffset,
     ];
 
+    $useShortNumbers = ($params["short_numbers"] ?? "") === "true";
+
     // total contributions
-    $totalContributions = $numFormatter->format($stats["totalContributions"]);
+    $totalContributions = formatNumber($stats["totalContributions"], $localeCode, $useShortNumbers);
     $firstContribution = formatDate($stats["firstContribution"], $dateFormat, $localeCode);
     $totalContributionsRange = $firstContribution . " - " . $localeTranslations["Present"];
 
     // current streak
-    $currentStreak = $numFormatter->format($stats["currentStreak"]["length"]);
+    $currentStreak = formatNumber($stats["currentStreak"]["length"], $localeCode, $useShortNumbers);
     $currentStreakStart = formatDate($stats["currentStreak"]["start"], $dateFormat, $localeCode);
     $currentStreakEnd = formatDate($stats["currentStreak"]["end"], $dateFormat, $localeCode);
     $currentStreakRange = $currentStreakStart;
@@ -432,7 +454,7 @@ function generateCard(array $stats, array $params = null): string
     }
 
     // longest streak
-    $longestStreak = $numFormatter->format($stats["longestStreak"]["length"]);
+    $longestStreak = formatNumber($stats["longestStreak"]["length"], $localeCode, $useShortNumbers);
     $longestStreakStart = formatDate($stats["longestStreak"]["start"], $dateFormat, $localeCode);
     $longestStreakEnd = formatDate($stats["longestStreak"]["end"], $dateFormat, $localeCode);
     $longestStreakRange = $longestStreakStart;
@@ -526,13 +548,6 @@ function generateCard(array $stats, array $params = null): string
                 </g>
             </g>
             <g style='isolation: isolate'>
-                <!-- Current Streak big number -->
-                <g transform='translate({$currentStreakOffset}, {$currentStreakHeightOffset[0]})'>
-                    <text x='0' y='32' stroke-width='0' text-anchor='middle' fill='{$theme["currStreakNum"]}' stroke='none' font-family='\"Segoe UI\", Ubuntu, sans-serif' font-weight='700' font-size='28px' font-style='normal' style='animation: currstreak 0.6s linear forwards'>
-                        {$currentStreak}
-                    </text>
-                </g>
-
                 <!-- Current Streak label -->
                 <g transform='translate({$currentStreakOffset}, {$currentStreakHeightOffset[1]})'>
                     <text x='0' y='32' stroke-width='0' text-anchor='middle' fill='{$theme["currStreakLabel"]}' stroke='none' font-family='\"Segoe UI\", Ubuntu, sans-serif' font-weight='700' font-size='14px' font-style='normal' style='opacity: 0; animation: fadein 0.5s linear forwards 0.9s'>
@@ -555,6 +570,13 @@ function generateCard(array $stats, array $params = null): string
                 <g transform='translate({$currentStreakOffset}, {$currentStreakHeightOffset[4]})' stroke-opacity='0' style='opacity: 0; animation: fadein 0.5s linear forwards 0.6s'>
                     <path d='M -12 -0.5 L 15 -0.5 L 15 23.5 L -12 23.5 L -12 -0.5 Z' fill='none'/>
                     <path d='M 1.5 0.67 C 1.5 0.67 2.24 3.32 2.24 5.47 C 2.24 7.53 0.89 9.2 -1.17 9.2 C -3.23 9.2 -4.79 7.53 -4.79 5.47 L -4.76 5.11 C -6.78 7.51 -8 10.62 -8 13.99 C -8 18.41 -4.42 22 0 22 C 4.42 22 8 18.41 8 13.99 C 8 8.6 5.41 3.79 1.5 0.67 Z M -0.29 19 C -2.07 19 -3.51 17.6 -3.51 15.86 C -3.51 14.24 -2.46 13.1 -0.7 12.74 C 1.07 12.38 2.9 11.53 3.92 10.16 C 4.31 11.45 4.51 12.81 4.51 14.2 C 4.51 16.85 2.36 19 -0.29 19 Z' fill='{$theme["fire"]}' stroke-opacity='0'/>
+                </g>
+
+                <!-- Current Streak big number -->
+                <g transform='translate({$currentStreakOffset}, {$currentStreakHeightOffset[0]})'>
+                    <text x='0' y='32' stroke-width='0' text-anchor='middle' fill='{$theme["currStreakNum"]}' stroke='none' font-family='\"Segoe UI\", Ubuntu, sans-serif' font-weight='700' font-size='28px' font-style='normal' style='animation: currstreak 0.6s linear forwards'>
+                        {$currentStreak}
+                    </text>
                 </g>
 
             </g>
